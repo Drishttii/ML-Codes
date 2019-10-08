@@ -97,5 +97,18 @@ for i in range(k):
     sigma[i] = np.cov(X_train[np.where(Y_train == i)[0]].T)
     cov_inv[i] = np.linalg.pinv(sigma[i])
     mean[i] = np.mean(X_train[np.where(Y_train == i)[0]], axis=0)
-  
+
+def classify(x):
+    estimator = np.zeros([k, 1])
+    for i in range(k):
+        estimator[i] = -0.5*(x-mean[i]).T@cov_inv[i]@(x-mean[i]) + np.log(prior[i])
+    return np.argmax(estimator)    
+
+predicted = np.zeros(Y_test.shape)
+for i in range(Y_test.shape[0]):
+    predicted[i] = classify(X_test[i])
+accuracy = np.sum(predicted == Y_test)/len(Y_test)
+# print(Y_test)
+# print(predicted)
+print("Accuracy is : ", accuracy*100)  
 
