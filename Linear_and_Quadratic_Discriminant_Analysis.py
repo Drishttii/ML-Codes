@@ -47,3 +47,39 @@ print("actual    : ", Y_test)
 
 accuracy = (prediction == Y_test)
 print("Accuracy is : ", np.sum(accuracy)/len(accuracy)*100)
+
+
+X = data
+Y = labels
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, train_size=0.9) 
+k = np.unique(labels).shape[0]
+pxl = X.shape[1]
+prior = np.zeros([k, 1])
+sigma = np.zeros([pxl, pxl])
+mean = np.zeros([k, pxl])
+samples = X_train.shape[0]
+
+
+for i in range(k):
+    prior[i] = len(np.where(Y_train == i)[0])/samples
+    sigma += np.cov(X_train[np.where(Y_train == i)[0]].T)
+    mean[i] = np.mean(X_train[np.where(Y_train == i)[0]], axis=0)
+    
+sigma /= k
+cov_inv = np.linalg.pinv(sigma)
+
+def classify(x):
+    estimator = np.zeros([k, 1])
+    for i in range(k):
+        estimator[i] = -0.5*(x-mean[i]).T@cov_inv@(x-mean[i]) + np.log(prior[i])
+    return np.argmax(estimator)    
+
+predicted = np.zeros(Y_test.shape)
+for i in range(Y_test.shape[0]):
+    predicted[i] = classify(X_test[i])
+
+accuracy = np.sum(predicted == Y_test)/len(Y_test)
+print("Accuracy is : ", accuracy*100)
+
+
+
