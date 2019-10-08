@@ -81,5 +81,21 @@ for i in range(Y_test.shape[0]):
 accuracy = np.sum(predicted == Y_test)/len(Y_test)
 print("Accuracy is : ", accuracy*100)
 
+X = data
+Y = labels
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, train_size=0.9) 
+k = np.unique(labels).shape[0]
+pxl = X.shape[1]
+prior = np.zeros([k, 1])
+sigma = np.zeros([k, pxl, pxl])
+mean = np.zeros([k, pxl])
+samples = X_train.shape[0]
+cov_inv = np.zeros([k, pxl, pxl])
 
+for i in range(k):
+    prior[i] = len(np.where(Y_train == i)[0])/samples
+    sigma[i] = np.cov(X_train[np.where(Y_train == i)[0]].T)
+    cov_inv[i] = np.linalg.pinv(sigma[i])
+    mean[i] = np.mean(X_train[np.where(Y_train == i)[0]], axis=0)
+  
 
